@@ -5,7 +5,7 @@ Implements parser → run merger → BM25 query processor.
 
 #  BM25 Search Engine – CS-GY 6913 (Web Search Engines)
 
-This repo contains my implementation of a small-scale search system built for **CS-GY 6913 (Web Search Engines)** at NYU Tandon, Fall 2025.  
+This repo contains my implementation of a small-scale search system built for **CS-GY 6913 (Web Search Engines)** at NYU , Fall 2025.  
 The goal of the assignment was to design and implement an end-to-end retrieval engine—from raw text to ranked results—using an inverted index and the BM25 ranking function.
 
 ---
