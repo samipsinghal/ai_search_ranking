@@ -203,7 +203,7 @@ ai_search_ranking/
 └── test_tokenize.py
 
 
-
+```
 
 
 ---
@@ -221,6 +221,8 @@ pip install -r requirements.txt
 If you want to use the optional LLM-snippet feature:
 
 export OPENAI_API_KEY=sk-<your-key>
+
+```
 
 ## Data
 You can either download MS MARCO data automatically or provide your own TSVs.
