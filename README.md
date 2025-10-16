@@ -144,6 +144,7 @@ PYTHONPATH=. python scripts/report_effectiveness.py \
   --qrels data/qrels.dev.small.txt \
   --run runs/dev_run.trec
 
+'''
 
 10) Future Work (drop-in ideas)
 Block-max WAND or MaxScore to skip non-competitive documents.
