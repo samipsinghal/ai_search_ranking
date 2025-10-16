@@ -97,7 +97,7 @@ If you want to use the optional LLM-snippet feature:
 
 export OPENAI_API_KEY=sk-<your-key>
 
-#Data
+## Data
 You can either download MS MARCO data automatically or provide your own TSVs.
 
 1. Download MS MARCO subset
@@ -112,7 +112,7 @@ data/qrels.dev.small.txt
 
 
 
-#Building the Index
+## Building the Index
 
 # Step 1: Build intermediate runs
 python -m src.index_build \
@@ -133,7 +133,7 @@ index/final/
  └─ doclen.bin     # doc length info
 
 
-#Interactive Search (BM25)
+## Interactive Search (BM25)
 
 python -m src.query_bm25 \
   --index_dir index/final \
@@ -150,7 +150,7 @@ credit score
     └─ text:    Both the Equifax Credit Score and the FICO Score are general-purpose models…
 
 
-#Batch Evaluation Workflow
+## Batch Evaluation Workflow
 
 Step 1: Generate a run file (batch search)
 
@@ -169,8 +169,7 @@ PYTHONPATH=. python scripts/report_effectiveness.py \
   --run runs/dev_run.trec
 
 
-<<<<<<< HEAD
-Acknowledgements
+## Acknowledgements
 Built for CS-GY 6913 – Web Search Engines (Prof. Torsten Suel, NYU Tandon, Fall 2025).
 Dataset: MS MARCO Passage Ranking.
 Code: Python 3.12.
