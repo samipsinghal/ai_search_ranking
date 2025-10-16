@@ -8,12 +8,6 @@ Implements parser → run merger → BM25 query processor.
 This repo contains my implementation of a small-scale search system built for **CS-GY 6913 (Web Search Engines)** at NYU , Fall 2025.  
 The goal of the assignment was to design and implement an end-to-end retrieval engine—from raw text to ranked results—using an inverted index and the BM25 ranking function.
 
-=======
-
-# AI Search Ranking  
-*A compact BM25-based search engine built from scratch for CS-GY 6913 (Web Search Engines, NYU Tandon)*
->>>>>>> f12d062 (update readme and efficiency report with baselines)
-
 ---
 
 ##  Overview  
@@ -169,8 +163,6 @@ PYTHONPATH=. python scripts/report_effectiveness.py \
   --run runs/dev_run.trec
 
 
-## Acknowledgements
-Built for CS-GY 6913 – Web Search Engines (Prof. Torsten Suel, NYU Tandon, Fall 2025).
 Dataset: MS MARCO Passage Ranking.
 Code: Python 3.12.
 =======
@@ -218,4 +210,3 @@ LLM Snippets (src/llm_snippets.py) can generate contextual summaries for each to
 Course: CS-GY 6913 – Web Search Engines (Prof. Torsten Suel, NYU , Fall 2025)
 Dataset: MS MARCO Passage Ranking v1.1
 Implementation: Developed by Samip Singhal as part of the retrieval and ranking module.
->>>>>>> f12d062 (update readme and efficiency report with baselines)
