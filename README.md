@@ -38,6 +38,129 @@ collection.tsv → index_build → index_merge → query_bm25 → evaluation
 **Libraries used:**  
 Python 3.12, `pandas`, `pytrec_eval`, `datasets`, and standard library modules only.
 
+
+## Implementation Optimizations
+
+This section summarizes the design choices and micro-optimizations that improve **latency**, **I/O**, and **space usage** in the system. References point to the relevant source files.
+
+### 1) Tokenization & Parsing
+- **Lowercase alphanumeric tokenizer** (`src/common.py`): uses a precompiled regex `[A-Za-z0-9]+` and an HTML stripper that ignores `<script>/<style>`.  
+  *Why:* stable, fast, and aligned with typical MS MARCO “bag of words” preprocessing; avoids unicode corner cases without crashing.
+
+### 2) I/O-Efficient Index Construction (External Merge)
+- **Run generation** (`src/index_build.py`): processes the corpus in configurable batches (`--batch_docs`), spills sorted triples `(term, docid, tf)` to disk as `run_*.tsv`.  
+  *Why:* prevents unbounded memory growth on large corpora and keeps per-spill sort cheap.
+- **K-way merge** (`src/index_merge.py`): streams all runs with heap-merged `(term, docid)` order via lightweight `Cursor`s; never materializes full postings in memory.  
+  *Why:* minimizes peak RSS while preserving sequential disk access patterns.
+
+### 3) Compression & On-Disk Layout
+- **Delta + VarByte** (`src/varbyte.py`, `src/index_merge.py`):  
+  - DocIDs are **delta-encoded** and then **variable-byte** compressed.  
+  - Term frequencies are **VarByte** compressed.  
+  - Per term block layout (little-endian):
+    ```
+    [df:uint32]
+    [docids_len:uint32][docid_deltas_varbyte...]
+    [tfs_len:uint32]   [tf_varbyte...]
+    ```
+  *Why:* delta coding yields 50–80% fewer bytes for monotonically increasing docIDs; VarByte is simple, CPU-light, and fast to decode.
+
+- **Separated streams** (docIDs and TFs stored in separate contiguous slices).  
+  *Why:* enables decoding only what is needed and better cache locality during DAAT traversal.
+
+- **Binary metadata file (`lexicon.tsv`)**: stores `term, df, offset, length`.  
+  *Why:* allows direct `seek(offset)` + `read(length)` per term with no scanning.
+
+- **Doc length sidecar (`doclen.bin`)**: contiguous `uint32` array, little-endian.  
+  *Why:* O(1) random access by docid during BM25 scoring with minimal RAM.
+
+**Result on 100k MS MARCO sample (for reference):**
+
+
+postings.bin ≈ 9.89 MB
+lexicon.tsv ≈ 2.16 MB
+doclen.bin ≈ 0.38 MB
+TOTAL ≈ 12.43 MB
+
+
+
+### 4) Query-Time Latency & I/O
+- **On-demand decoding** (`src/query_bm25.py::read_term_postings`):  
+  Performs `seek+read(length)` for exactly one term block, decodes minimally, and delta-expands in a tight loop.  
+  *Why:* avoids preloading or decompressing entire lists; reduces cache misses and page faults.
+
+- **DAAT scoring** (`score_disjunctive` / `score_conjunctive`):  
+  Uses a min-heap over list heads; advances only contributing iterators.  
+  *Why:* minimizes passes over large lists; benefits from already-sorted docIDs.
+
+- **Lightweight counters**: per-query **seeks** and **bytes read** are recorded; `scripts/report_efficiency.py` reports **mean / p50 / p90 / p95 / p99** latency and approximate throughput.  
+  *Why:* ties latency to I/O cost for principled tuning.
+
+**Observed single-term decode on this corpus:**
+
+
+mean ~0.00 ms (p95 ~0.01 ms); warm throughput ~360k decodes/sec
+
+(Real multi-term query latency depends on term df and posting lengths.)
+
+### 5) Data Types & Endianness
+- **Doc lengths:** `uint32` little-endian in `doclen.bin`.  
+  *Why:* compact, fixed-width, direct indexing with `struct.unpack('<I')`.
+- **Block headers (`df`, lengths):** `uint32` little-endian.  
+  *Why:* predictable structure and platform-agnostic serialization.
+- **Offsets/lengths in `lexicon.tsv`:** integers (bytes).  
+  *Why:* direct addressing without pointer chasing.
+
+### 6) BM25 Details
+- **Parameters:** default `k1=0.9`, `b=0.4` (interactive), tunable via CLI; batch evaluation often uses `k1≈1.2`, `b≈0.75` (MS MARCO baseline friendly).  
+  *Why:* exposes the classic efficiency–effectiveness trade-off while keeping code paths identical.
+
+### 7) Practical I/O Tricks
+- **Batch size control** during run generation (`--batch_docs`) to balance sort cost vs spill frequency.  
+- **Contiguous file layout** for postings to favor sequential reads when multiple term blocks are adjacent.  
+- **No gzip/bzip** of entire files (explicitly avoided): compression happens at the postings-block level so seeking stays O(1).
+
+### 8) Evaluation Depth & Output Size
+- **`--topk`** in `scripts/search_to_run.py` controls results per query:  
+  - `--topk 100` for fast iteration and `MRR@10`/`nDCG@10`.  
+  - `--topk 1000` for `Recall@1000` and full baselines.  
+  *Why:* shallow runs are faster and smaller; deeper runs enable recall-oriented metrics.
+
+### 9) Typical Baseline (MS MARCO Dev)
+With correct tokenization and ID alignment:
+- **MRR@10** ≈ 0.19–0.21  
+- **nDCG@10** ≈ 0.22–0.24  
+- **Recall@1000** ≈ 0.85–0.90
+
+Use:
+```bash
+PYTHONPATH=. python -u scripts/search_to_run.py \
+  --index_dir index/final \
+  --queries data/queries.dev.tsv \
+  --run_out runs/dev_run.trec \
+  --k1 1.2 --b 0.75 --mode disj --topk 1000
+
+PYTHONPATH=. python scripts/report_effectiveness.py \
+  --qrels data/qrels.dev.small.txt \
+  --run runs/dev_run.trec
+
+
+10) Future Work (drop-in ideas)
+Block-max WAND or MaxScore to skip non-competitive documents.
+Static cache for head segments of frequent terms.
+PEF/SIMD-BP128 for faster integer decoding.
+Memory-mapped postings for OS-level readahead on repeated workloads.
+
+
+---
+
+If you want, I can tailor that section with your exact measured p50/p95/p99 latencies from `scripts/report_efficiency.py` and add a small before/after table.
+
+
+
+
+
+
 ---
 
 ## Directory Layout
@@ -75,6 +198,9 @@ ai_search_ranking/
 │
 └── tests/
 └── test_tokenize.py
+
+
+
 
 
 ---
