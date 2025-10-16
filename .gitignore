@@ -1,0 +1,30 @@
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+
+# Data & indexes (keep only the small sample file)
+data/*
+!data/collection.sample100000.tsv
+!data/page_table.tsv        # small mapping is fine
+index/tmp/
+index/final/
+
+# Caches / logs
+.cache/
+*.log
+
+# Notebooks (if any) checkpoints
+.ipynb_checkpoints/
