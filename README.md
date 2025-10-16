@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ai_search_ranking
 Small inverted-index search engine using Python  
 Implements parser → run merger → BM25 query processor.
@@ -8,7 +7,9 @@ Implements parser → run merger → BM25 query processor.
 
 This repo contains my implementation of a small-scale search system built for **CS-GY 6913 (Web Search Engines)** at NYU , Fall 2025.  
 The goal of the assignment was to design and implement an end-to-end retrieval engine—from raw text to ranked results—using an inverted index and the BM25 ranking function.
+
 =======
+
 # AI Search Ranking  
 *A compact BM25-based search engine built from scratch for CS-GY 6913 (Web Search Engines, NYU Tandon)*
 >>>>>>> f12d062 (update readme and efficiency report with baselines)
@@ -96,7 +97,7 @@ If you want to use the optional LLM-snippet feature:
 
 export OPENAI_API_KEY=sk-<your-key>
 
-Data
+#Data
 You can either download MS MARCO data automatically or provide your own TSVs.
 
 1. Download MS MARCO subset
@@ -111,7 +112,7 @@ data/qrels.dev.small.txt
 
 
 
-Building the Index
+#Building the Index
 
 # Step 1: Build intermediate runs
 python -m src.index_build \
@@ -132,7 +133,7 @@ index/final/
  └─ doclen.bin     # doc length info
 
 
-Interactive Search (BM25)
+#Interactive Search (BM25)
 
 python -m src.query_bm25 \
   --index_dir index/final \
@@ -149,7 +150,7 @@ credit score
     └─ text:    Both the Equifax Credit Score and the FICO Score are general-purpose models…
 
 
-Batch Evaluation Workflow
+#Batch Evaluation Workflow
 
 Step 1: Generate a run file (batch search)
 
@@ -182,7 +183,7 @@ Recall@100 : 0.421
 Recall@1000: 0.656
 
 
-Efficiency Report
+#Efficiency Report
 
 Measure index size and latency:
 
@@ -206,14 +207,14 @@ Baselines
 | Dense (ANCE / MiniLM)           | 0.33–0.38 | For comparison only          |
 
 
-Notes & Tips
+#Notes & Tips
 
 topk controls how many results per query are written; use 100 for speed, 1000 for full evaluation.
 Evaluation uses pytrec_eval (TREC style metrics).
 Efficiency and effectiveness can be run independently.
 LLM Snippets (src/llm_snippets.py) can generate contextual summaries for each top result.
 
-Acknowledgments
+#Acknowledgments
 
 Course: CS-GY 6913 – Web Search Engines (Prof. Torsten Suel, NYU , Fall 2025)
 Dataset: MS MARCO Passage Ranking v1.1
