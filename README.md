@@ -227,6 +227,8 @@ export OPENAI_API_KEY=sk-<your-key>
 ## Data
 You can either download MS MARCO data automatically or provide your own TSVs.
 
+```bash
+
 1. Download MS MARCO subset
 
 python -m scripts.download_msmarco_queries
@@ -252,6 +254,8 @@ python -m src.index_merge \
   --tmpdir index/tmp \
   --outdir index/final
 
+```
+
 You’ll get:
 
 index/final/
@@ -261,6 +265,7 @@ index/final/
 
 
 ## Interactive Search (BM25)
+```bash
 
 python -m src.query_bm25 \
   --index_dir index/final \
@@ -268,6 +273,7 @@ python -m src.query_bm25 \
   --page_table data/page_table.tsv \
   --snippet --show_text
 
+```
 
 Example:
 
@@ -281,6 +287,8 @@ credit score
 
 Step 1: Generate a run file (batch search)
 
+```
+
 PYTHONPATH=. python -u scripts/search_to_run.py \
   --index_dir index/final \
   --queries data/queries.dev.tsv \
@@ -289,11 +297,18 @@ PYTHONPATH=. python -u scripts/search_to_run.py \
 
 (--topk = results per query; use 100 for fast debug, 1000 for full recall)
 
+```
+
 Step 2: Evaluate effectiveness
+
+
+```
 
 PYTHONPATH=. python scripts/report_effectiveness.py \
   --qrels data/qrels.dev.small.txt \
   --run runs/dev_run.trec
+
+```
 
 
 Dataset: MS MARCO Passage Ranking.
