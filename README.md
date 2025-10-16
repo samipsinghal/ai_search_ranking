@@ -42,6 +42,12 @@ Python 3.12, `pandas`, `pytrec_eval`, `datasets`, and standard library modules o
 
 ##  Directory Layout
 
+
+
+## Directory Layout
+
+```text
+
 ai_search_ranking/
 ├── data/
 │ ├── collection.sample100000.tsv
