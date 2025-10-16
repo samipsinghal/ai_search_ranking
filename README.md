@@ -322,7 +322,7 @@ Recall@100 : 0.421
 Recall@1000: 0.656
 
 
-#Efficiency Report
+### Efficiency Report
 
 Measure index size and latency:
 
@@ -346,14 +346,14 @@ Baselines
 | Dense (ANCE / MiniLM)           | 0.33–0.38 | For comparison only          |
 
 
-#Notes & Tips
+### Notes & Tips
 
 topk controls how many results per query are written; use 100 for speed, 1000 for full evaluation.
 Evaluation uses pytrec_eval (TREC style metrics).
 Efficiency and effectiveness can be run independently.
 LLM Snippets (src/llm_snippets.py) can generate contextual summaries for each top result.
 
-#Acknowledgments
+### Acknowledgments
 
 Course: CS-GY 6913 – Web Search Engines (Prof. Torsten Suel, NYU , Fall 2025)
 Dataset: MS MARCO Passage Ranking v1.1
