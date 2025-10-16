@@ -132,9 +132,9 @@ With correct tokenization and ID alignment:
 - **nDCG@10** ≈ 0.22–0.24  
 - **Recall@1000** ≈ 0.85–0.90
 
-`Use:`
+Use:
 
-```` ```bash ````
+```bash 
 
 PYTHONPATH=. python -u scripts/search_to_run.py \
   --index_dir index/final \
@@ -146,9 +146,9 @@ PYTHONPATH=. python scripts/report_effectiveness.py \
   --qrels data/qrels.dev.small.txt \
   --run runs/dev_run.trec
 
-```` ``` ````
+```
 
-10) Future Work (drop-in ideas)
+### 10) Future Work (drop-in ideas)
 Block-max WAND or MaxScore to skip non-competitive documents.
 Static cache for head segments of frequent terms.
 PEF/SIMD-BP128 for faster integer decoding.
