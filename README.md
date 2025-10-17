@@ -361,6 +361,12 @@ Single-term decode latency over 100 random terms:
   WARM      mean=0.01 ms  p50=0.00  p90=0.00  p95=0.02  p99=0.24
 
 
+DISJ latency over 10 queries:
+  mean=46.84 ms  min=10.09  max=112.75
+  p50=44.47  p90=67.86  p95=90.30  p99=108.26
+  I/O per query (means): seeks=0.0, bytes=0
+
+
 ```
 
 Baselines
