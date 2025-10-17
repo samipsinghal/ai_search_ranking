@@ -1,0 +1,30 @@
+ ### Index Build ####
+
+  python -m src.index_build \
+  --input data/collection.tsv \
+  --outdir index/tmp \
+  --batch_docs 200000
+
+
+  ### Index Merge 
+ 
+ python -m src.index_merge \
+  --tmpdir index/tmp \
+  --outdir index/final
+
+### BM25 Querying ####  
+ 
+ python -m src.query_bm25 \
+  --index_dir index/final \
+  --collection data/collection.tsv \
+  --page_table data/page_table.tsv \
+  --mode disj \
+  --k1 1.2 --b 0.75 \
+  --snippet\
+
+### download data 
+
+python download_data.py \
+  --out data/collection.tsv \
+  --page_table_out data/page_table.tsv \
+  --sample 100000

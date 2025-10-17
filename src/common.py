@@ -45,7 +45,23 @@ def strip_html(html_text: str) -> str:
         return html_text
 
 def tokenize(text: str):
-    """Yield lowercase alphanumeric tokens from the given text."""
+    """Yield lowercase alphanumeric tokens from the given text.
+    Convert a raw text passage into a stream of normalized tokens.
+
+    Steps:
+      1. Removes all HTML markup using strip_html().
+      2. Lowercases the text for case-insensitive matching.
+      3. Yields contiguous alphanumeric sequences (A–Z, a–z, 0–9) as tokens.
+
+    The function is implemented as a generator (using 'yield'), so tokens are 
+    produced lazily — one at a time — instead of creating a large list in memory. 
+    This makes it efficient for streaming large corpora, such as millions of 
+    MS MARCO passages, during indexing or query processing.
+
+    Example:
+        list(tokenize("<b>Loan-to-Value</b> ratio is 80%!"))
+        → ['loan', 'to', 'value', 'ratio', 'is', '80']
+    """
     clean = strip_html(text).lower()
     for match in _TOKEN.finditer(clean):
         yield match.group(0)

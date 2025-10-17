@@ -170,6 +170,11 @@ def _flush_term(term: str,
     # ----------------------------------------------------
     # 5. Record metadata for this term in lexicon.tsv
     # ----------------------------------------------------
+    # Record this term’s metadata in the lexicon:
+    #   term, df, byte offset, and block length.
+    # This lets the query processor seek directly into postings.bin later.
+    
+    
     lexicon_f.write(f"{term}\t{df}\t{file_offset}\t{length}\n")
 
     return file_offset + length
@@ -183,6 +188,12 @@ def merge_runs(tmpdir: str, outdir: str) -> None:
     It maintains a min-heap keyed by (term, docid), so we always know
     which posting to process next globally.
     """
+
+    # Initialize a min-heap across all run files.
+    # Each heap entry holds (term, docid, run_id).
+    # The smallest (term, docid) globally is always at heap[0],
+    # ensuring we process terms in lexicographic order without loading all data.
+    
     os.makedirs(outdir, exist_ok=True)
 
     # Locate all intermediate runs
@@ -196,6 +207,12 @@ def merge_runs(tmpdir: str, outdir: str) -> None:
 
     print(f"[INFO] Merging {len(run_paths)} runs from {tmpdir} ...")
 
+    # Open output files:
+    # postings.bin — binary data for all compressed postings lists
+    # lexicon.tsv  — table of contents for postings.bin (term → offset)
+
+    
+    
     with open(postings_path, "wb") as postings_f, open(lexicon_path, "w", encoding="utf-8") as lexicon_f:
 
         # ------------------------------------------------
@@ -245,9 +262,18 @@ def merge_runs(tmpdir: str, outdir: str) -> None:
         if current_term is not None:
             file_offset = _flush_term(current_term, postings, postings_f, lexicon_f, file_offset)
 
+    # After processing all runs:
+    # postings.bin now contains contiguous compressed blocks for every term.
+    # lexicon.tsv maps each term to its corresponding byte range in postings.bin.
+
     print(f"[OK] Wrote postings -> {postings_path}")
     print(f"[OK] Wrote lexicon  -> {lexicon_path}")
 
+# Summary:
+#  - postings.bin holds only numeric, compressed data (no term strings)
+#  - lexicon.tsv provides the lookup table (term → offset/length)
+#  - Together they enable efficient on-disk inverted index traversal
+#    where the query processor can jump straight to a term’s postings.
 
 # ============================================================================
 # 3. CLI entrypoint

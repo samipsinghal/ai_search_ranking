@@ -32,7 +32,7 @@ def write_tsv(ds, out_path, limit=None, page_table_out=None):
             text = sanitize(row.get("passage") or row.get("text") or "")
             f.write(f"{i}\t{text}\n")
             if pt_fp:
-                # Keep a mapping so your query UI can show original IDs later
+                # Keep a mapping so the query UI can show original IDs later
                 pt_fp.write(f"{i}\t{row.get('passage_id','')}\n")
             n += 1
             if limit and n >= limit:
@@ -53,7 +53,7 @@ def main():
                     help="Optional mapping docid<TAB>original_passage_id (set to '' to skip)")
     args = ap.parse_args()
 
-    # ✅ The correct config is "passage" (available configs are ['passage','query'])
+    # The correct config is "passage" (available configs are ['passage','query'])
     ds = load_dataset("sentence-transformers/msmarco-corpus", "passage", split="train")
 
     page_table_path = args.page_table_out or None
