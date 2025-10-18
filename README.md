@@ -337,6 +337,38 @@ Index size (MB)   : 12.4
 Single-term decode latency : mean=0.00 ms  p95=0.01 ms
 Throughput ≈ 360 k decodes/sec
 
+
+```bash
+samipsinghal@Mac ai_search_ranking % python -m scripts.report_efficiency \
+  --index_dir index/final \
+  --queries data/queries.dev.small.tsv \
+  --sample_n 10 \
+  --mode disj --k1 0.9 --b 0.4
+=== BM25 System Efficiency Report ===
+
+Documents indexed : 8,841,823
+Unique terms      : 1,470,267
+Average doc length: 57.84 tokens
+
+Index size (MB):
+  postings.bin : 804.84
+  lexicon.tsv  : 34.22
+  doclen.bin   : 33.73
+  TOTAL        : 872.79
+
+Single-term decode latency over 100 random terms:
+  COLD-ish  mean=0.01 ms  p50=0.00  p90=0.01  p95=0.02  p99=0.30
+  WARM      mean=0.01 ms  p50=0.00  p90=0.00  p95=0.02  p99=0.24
+
+
+DISJ latency over 10 queries:
+  mean=46.84 ms  min=10.09  max=112.75
+  p50=44.47  p90=67.86  p95=90.30  p99=108.26
+  I/O per query (means): seeks=0.0, bytes=0
+
+
+```
+
 Baselines
 
 | Model                           |    MRR@10 | Notes                        |
